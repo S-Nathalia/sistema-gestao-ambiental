@@ -62,6 +62,10 @@
                                     @if ($requerimento->documentos->count() > 0)
                                         <a class="btn" href="{{route('requerimento.documentacao', $requerimento->id)}}"><img class="icon-licenciamento" src="{{asset('img/documents-svgrepo-com.svg')}}"  alt="Analisar documentos" title="Analisar documentos"></a>
                                     @endif
+                                    @cannot('isProtocolista', \App\Models\User::class)
+                                        <a class="btn" data-toggle="modal" data-target="#documentos-analista"><img class="icon-licenciamento" src="{{asset('img/add-documents-svgrepo-com.svg')}}"  alt="Requistar documentos" title="Requistar documentos"></a>
+                                    @endcannot
+
                                     @can('isProtocolista', \App\Models\User::class)
                                         <a  href="{{route('requerimentos.editar.empresa', $requerimento->id)}}"><img class="icon-licenciamento" src="{{asset('img/building-svgrepo-com.svg')}}"  alt="Editar empresa" title="Editar Informações da Empresa/Serviço"></a>
                                         @if ($requerimento->documentos->count() > 0)
@@ -400,6 +404,41 @@
             </div>
         </div>
     </div>
+    <!-- Modal documentos analista -->
+    <div class="modal fade" id="documentos-analista" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: var(--primaria);">
+                    <h5 class="modal-title" id="staticBackdropLabel" style="color: white;">Requisitar documentos adicionais</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="documentos-form-analista" method="POST" action="{{route('requerimento.checklist.analista')}}">
+                        @csrf
+                        <div class="form-row">
+                            <div class="col-md-12">
+                                <h6 style="font-weight: bolder;">Documentos que o empresário deve enviar</h6>
+                            </div>
+                        </div><br>
+                        <input type="hidden" name="requerimento" value="{{$requerimento->id}}">
+                        @foreach ($docs_analistas as $i => $documento)
+                            <div class="form-check @if(!$loop->first) mt-3 @endif">
+                                <input id="documento-{{$documento->id}}" class="form-check-input" type="checkbox" name="documentos[]" value="{{$documento->id}}" @if(old('documentos.'.$i) != null) checked @endif>
+                                <label for="documento-{{$documento->id}}" class="form-check-label">{{$documento->nome}}</label>
+                            </div>
+                        @endforeach
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success btn-color-dafault submeterFormBotao" form="documentos-form-analista">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @if ($requerimento->documentos->count() <= 0)
         <!-- Modal documentos -->
         <div class="modal fade" id="documentos" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">

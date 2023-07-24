@@ -76,6 +76,11 @@ class Requerimento extends Model
         return $this->belongsToMany(Documento::class, 'checklists', 'requerimento_id', 'documento_id')->withPivot('caminho', 'comentario', 'status');
     }
 
+    public function documentos_analista()
+    {
+        return $this->belongsToMany(Documento::class, 'analista_checklist', 'requerimento_id', 'documento_id')->withPivot('caminho', 'comentario', 'status');
+    }
+
     public function visitas()
     {
         return $this->hasMany(Visita::class, 'requerimento_id');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RequerimentoRequest;
 use App\Models\Checklist;
+use App\Models\AnalistaChecklist;
 use App\Models\Cnae;
 use App\Models\Documento;
 use App\Models\Empresa;
@@ -150,7 +151,8 @@ class RequerimentoController extends Controller
      * @throws AuthorizationException
      */
     public function show($id)
-    {
+    {   
+        $docs_analistas = Documento::all();
         $requerimento = Requerimento::find($id);
         $this->authorize('view', $requerimento);
         $protocolistas = User::protocolistas();
@@ -158,7 +160,7 @@ class RequerimentoController extends Controller
         $documentos = Documento::orderBy('nome')->get();
         $definir_valor = Requerimento::DEFINICAO_VALOR_ENUM;
 
-        return view('requerimento.show', compact('requerimento', 'protocolistas', 'analistas', 'documentos', 'definir_valor'));
+        return view('requerimento.show', compact('docs_analistas', 'requerimento', 'protocolistas', 'analistas', 'documentos', 'definir_valor'));
     }
 
     /**
@@ -293,6 +295,27 @@ class RequerimentoController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */
+
+    public function storeChecklistAnalista(Request $request)
+    {
+        if ($request->documentos == null) {
+            return redirect()->back()->withErrors(['error' => 'Selecione os documentos que devem ser enviados pelo requerente.'])->withInput($request->all());
+        }
+
+        $requerimento = Requerimento::find($request->requerimento);
+
+        foreach ($request->documentos as $documento_id) {
+            $requerimento->documentos_analista()->attach($documento_id);
+            $documento = $requerimento->documentos_analista()->where('documento_id', $documento_id)->first()->pivot;
+            $documento->status = AnalistaChecklist::STATUS_ENUM['nao_enviado'];
+            $documento->update();
+        }
+        
+        // Notification::send($requerimento->empresa->user, new DocumentosNotification($requerimento, $requerimento->documentos, 'Documentos requeridos'));
+
+        return redirect(route('requerimentos.show', ['requerimento' => $requerimento->id]))->with(['success' => 'Checklist salva com sucesso, aguarde o requerente enviar os documentos.']);
+    }
+
     public function storeChecklist(Request $request)
     {
         $request->validate([
@@ -471,7 +494,7 @@ class RequerimentoController extends Controller
      * @throws AuthorizationException
      */
     public function showRequerimentoDocumentacao($id)
-    {
+    {   
         $requerimento = Requerimento::find($id);
         $this->authorize('verDocumentacao', $requerimento);
         $documentos = $requerimento->documentos;
@@ -481,6 +504,21 @@ class RequerimentoController extends Controller
         }
 
         return view('requerimento.envio-documentos', compact('requerimento', 'documentos', 'status'));
+    }
+
+    public function showRequerimentoDocumentacaoAnalista($id)
+    {   
+        $requerimento = Requerimento::find($id);
+        // dd($requerimento);
+        $this->authorize('verDocumentacao', $requerimento);
+        $documentos = $requerimento->documentos_analista;
+        // dd($documentos);
+        $status = AnalistaChecklist::STATUS_ENUM;
+        // if (auth()->user()->role == User::ROLE_ENUM['analista']) {
+        //     return view('requerimento.analise-documentos', compact('requerimento', 'documentos'));
+        // }
+
+        return view('requerimento.envio-documentos-analista', compact('requerimento', 'documentos', 'status'));
     }
 
     /**

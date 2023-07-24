@@ -733,12 +733,13 @@
                                             @if ($requerimento->status != \App\Models\Requerimento::STATUS_ENUM['cancelada'])
                                                 @if ($requerimento->status == \App\Models\Requerimento::STATUS_ENUM['documentos_requeridos'])
                                                     <a title="Enviar documentação" href="{{route('requerimento.documentacao', $requerimento->id)}}" style="margin-left: 9px"><img class="icon-licenciamento" style="width: 30px" src="{{asset('img/documents-red-svgrepo-com.svg')}}"  alt="Enviar documentos"></a>
-                                                @elseif($requerimento->status == \App\Models\Requerimento::STATUS_ENUM['documentos_enviados'])
+                                                    @elseif($requerimento->status == \App\Models\Requerimento::STATUS_ENUM['documentos_enviados'])
                                                     <a title="Documentação em análise" href="{{route('requerimento.documentacao', $requerimento->id)}}" style="margin-left: 9px"><img class="icon-licenciamento" style="width: 30px" src="{{asset('img/documents-yellow-svgrepo-com.svg')}}"  alt="Enviar documentos"></a>
-                                                @elseif($requerimento->status >= \App\Models\Requerimento::STATUS_ENUM['documentos_aceitos'])
+                                                    @elseif($requerimento->status >= \App\Models\Requerimento::STATUS_ENUM['documentos_aceitos'])
                                                     <a title="Documentação aceita" href="{{route('requerimento.documentacao', $requerimento->id)}}" style="margin-left: 9px"><img class="icon-licenciamento" style="width: 30px" src="{{asset('img/documents-blue-svgrepo-com.svg')}}"  alt="Enviar documentos"></a>
                                                 @endif
                                             @endif
+                                            <a title="Enviar documentação" href="{{route('requerimento.documentacao.analista', $requerimento->id)}}" style="margin-left: 9px"><img class="icon-licenciamento" style="width: 30px" src="{{asset('img/documents-red-svgrepo-com.svg')}}"  alt="Enviar documentos"></a>
                                             @if($requerimento->status != \App\Models\Requerimento::STATUS_ENUM['finalizada'] || $requerimento->canceladoSecretario())
                                                 <a style="cursor: pointer; margin-left: 8px" data-toggle="modal" data-target="#cancelar_requerimento_{{$requerimento->id}}"><img class="icon-licenciamento" style="width: 30px" src="{{asset('img/trash-svgrepo-com.svg')}}"  alt="Cancelar" title="Cancelar"></a>
                                             @endif

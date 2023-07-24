@@ -62,9 +62,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/boletos/baixar-relatorio', [BoletoController::class, 'gerarRelatorioBoletos'])->name('gerar.pdf.boletos');
 
     Route::post('/requerimentos/salvar-checklist', [RequerimentoController::class, 'storeChecklist'])->name('requerimento.checklist');
+    Route::post('/requerimentos/salvar-checklist-analista', [RequerimentoController::class, 'storeChecklistAnalista'])->name('requerimento.checklist.analista');
     Route::put('/requerimentos/update-checklist', [RequerimentoController::class, 'updateChecklist'])->name('requerimento.checklist.edit');
     Route::put('/requerimentos/{requerimento}/update-valor', [RequerimentoController::class, 'updateValor'])->name('requerimento.valor.edit');
     Route::get('/requerimentos/{requerimento_id}/documentacao', [RequerimentoController::class, 'showRequerimentoDocumentacao'])->name('requerimento.documentacao');
+    Route::get('/requerimentos/{requerimento_id}/documentacao-analista', [RequerimentoController::class, 'showRequerimentoDocumentacaoAnalista'])->name('requerimento.documentacao.analista');
     Route::post('/requerimentos/{requerimento_id}/enviar-documentos', [RequerimentoController::class, 'enviarDocumentos'])->name('requerimento.enviar.documentos');
     Route::post('/requerimentos/{requerimento_id}/analisar-documentos', [RequerimentoController::class, 'analisarDocumentos'])->name('requerimento.analisar.documentos');
     Route::get('/requerimentos/{requerimento_id}/documentacao/{documento_id}', [RequerimentoController::class, 'showDocumento'])->name('requerimento.documento');
